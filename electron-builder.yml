@@ -1,0 +1,17 @@
+appId: com.novos.os
+productName: NOVOS
+files:
+  - dist/**
+  - electron/**
+  - package.json
+directories:
+  output: release
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+mac:
+  target:
+    - dmg
