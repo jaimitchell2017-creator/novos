@@ -1,0 +1,47 @@
+name: Build NOVOS ISO
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'iso/**'
+      - 'package.json'
+      - 'vite.config.ts'
+      - '.github/workflows/build-novos-iso.yml'
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install ISO tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools dosfstools
+
+      - name: Install NOVOS dependencies
+        run: npm install
+
+      - name: Build NOVOS web app
+        run: npm run web:build
+
+      - name: Build ISO
+        run: sudo bash iso/build-iso.sh
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: NOVOS-OS-Development-0.1-amd64
+          path: NOVOS-OS-Development-0.1-amd64.iso
+          if-no-files-found: error
